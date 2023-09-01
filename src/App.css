@@ -1,6 +1,18 @@
+
 .App {
   text-align: center;
+  padding: 2rem;
 }
+
+.canvas-container {
+  display: flex;
+  gap: 20px; /* Adjust the gap as needed */
+}
+
+.canvas {
+  border: 1px solid black;
+}
+
 
 .App-logo {
   height: 40vmin;
