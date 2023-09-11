@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
 function App() {
+  const [zoomLevel, setZoomLevel] = useState(1.0);
+
   useEffect(() => {
     const canvas1 = document.getElementById('canvas1');
     const ctx1 = canvas1.getContext('2d');
@@ -19,44 +21,53 @@ function App() {
 
     const symbols = ['▲', '®', '°', '⭕'];
 
-    for (let row = 0; row < numRows; row++) {
-      for (let col = 0; col < numCols; col++) {
-        const x = col * boxSize;
-        const y = row * boxSize;
-        const symbolIndex = col === 0 ? 0 : col === numCols - 1 ? 3 : (col % 2) + 1;
-        const symbol = symbols[symbolIndex];
+    function drawCanvas(context, zoom) {
+      context.clearRect(0, 0, canvas1.width, canvas1.height);
+      context.save();
+      context.scale(zoom, zoom);
+      
+      for (let row = 0; row < numRows; row++) {
+        for (let col = 0; col < numCols; col++) {
+          const x = col * boxSize;
+          const y = row * boxSize;
+          const symbolIndex = col === 0 ? 0 : col === numCols - 1 ? 3 : (col % 2) + 1;
+          const symbol = symbols[symbolIndex];
 
-        ctx1.strokeStyle = 'black';
-        ctx1.strokeRect(x, y, boxSize, boxSize);
-        ctx1.font = `${symbolSize}px sans-serif`;
-        ctx1.textBaseline = 'middle';
-        ctx1.textAlign = 'center';
-        ctx1.fillText(symbol, x + boxSize / 2, y + boxSize / 2);
-
-        ctx2.strokeStyle = 'black';
-        ctx2.strokeRect(x, y, boxSize, boxSize);
-        ctx2.font = `${symbolSize}px sans-serif`;
-        ctx2.textBaseline = 'middle';
-        ctx2.textAlign = 'center';
-        ctx2.fillText(symbol, x + boxSize / 2, y + boxSize / 2);
-
-        ctx3.strokeStyle = 'black';
-        ctx3.strokeRect(x, y, boxSize, boxSize);
-        ctx3.font = `${symbolSize}px sans-serif`;
-        ctx3.textBaseline = 'middle';
-        ctx3.textAlign = 'center';
-        ctx3.fillText(symbol, x + boxSize / 2, y + boxSize / 2);
+          context.strokeStyle = 'black';
+          context.strokeRect(x, y, boxSize, boxSize);
+          context.font = `${symbolSize}px sans-serif`;
+          context.textBaseline = 'middle';
+          context.textAlign = 'center';
+          context.fillText(symbol, x + boxSize / 2, y + boxSize / 2);
+        }
       }
+
+      context.restore();
     }
-  }, []);
+
+    drawCanvas(ctx1, zoomLevel);
+    drawCanvas(ctx2, zoomLevel);
+    drawCanvas(ctx3, zoomLevel);
+  }, [zoomLevel]);
+
+  const handleZoomIn = () => {
+    setZoomLevel(Math.min(2.0, zoomLevel + 0.1)); // Adjust the maximum zoom level as needed
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel(Math.max(0.5, zoomLevel - 0.1)); // Adjust the minimum zoom level as needed
+  };
 
   return (
     <div className="App">
-      
+      <div className="zoom-controls">
+        <button onClick={handleZoomIn}>Zoom In</button>
+        <button onClick={handleZoomOut}>Zoom Out</button>
+      </div>
       <div className="canvas-container">
-        <canvas id="canvas1" className="canvas" width={4 * 50} height={9 * 50}></canvas>
-        <canvas id="canvas2" className="canvas" width={4 * 50} height={9 * 50}></canvas>
-        <canvas id="canvas3" className="canvas" width={4 * 50} height={9 * 50}></canvas>
+        <canvas id="canvas1" className="canvas" width={4 * 50 * zoomLevel} height={9 * 50 * zoomLevel}></canvas>
+        <canvas id="canvas2" className="canvas" width={4 * 50 * zoomLevel} height={9 * 50 * zoomLevel}></canvas>
+        <canvas id="canvas3" className="canvas" width={4 * 50 * zoomLevel} height={9 * 50 * zoomLevel}></canvas>
       </div>
     </div>
   );
