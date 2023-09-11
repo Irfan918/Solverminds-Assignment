@@ -18,6 +18,8 @@ function App() {
     const numCols = 4;
     const boxSize = 50;
     const symbolSize = 20;
+    const padding = 5; // Padding around symbols
+    const margin = 5; // Margin from the square line
 
     const symbols = ['▲', '®', '°', '⭕'];
 
@@ -25,7 +27,7 @@ function App() {
       context.clearRect(0, 0, canvas1.width, canvas1.height);
       context.save();
       context.scale(zoom, zoom);
-      
+
       for (let row = 0; row < numRows; row++) {
         for (let col = 0; col < numCols; col++) {
           const x = col * boxSize;
@@ -38,7 +40,38 @@ function App() {
           context.font = `${symbolSize}px sans-serif`;
           context.textBaseline = 'middle';
           context.textAlign = 'center';
-          context.fillText(symbol, x + boxSize / 2, y + boxSize / 2);
+
+          if (row === 0 && col === 1) {
+            // Draw all symbols in the specified square (0,1)
+            const centerX = x + boxSize / 2;
+            const centerY = y + boxSize / 2;
+
+            // Draw corner symbols with padding and margin
+            const smallSymbolSize = 12;
+            context.font = `${smallSymbolSize}px sans-serif`;
+
+            // Draw '$' on the top left
+            context.fillText('$', x + margin, y + margin + smallSymbolSize);
+
+            // Draw 'RE' at the bottom left
+            context.fillText('RE', x + margin + padding, y + boxSize - margin - padding - smallSymbolSize);
+
+            // Draw '*' between '$' and 'RE'
+            context.fillText('*', x + margin + smallSymbolSize + padding / 2, y + margin + smallSymbolSize + padding);
+
+            // Draw '*' on the bottom right
+            context.fillText('*', x + boxSize - margin - padding, y + boxSize - margin - padding);
+
+            // Draw center number
+            context.font = '14px sans-serif';
+            context.fillText('1', centerX, centerY);
+          } else if ((row === 0 && col === 2) || (row === 1 && (col === 1 || col === 2))) {
+            // Clear the content while keeping the outline
+            context.clearRect(x + 1, y + 1, boxSize - 2, boxSize - 2);
+          } else {
+            // Skip drawing for other squares
+            context.fillText(symbol, x + boxSize / 2, y + boxSize / 2);
+          }
         }
       }
 
